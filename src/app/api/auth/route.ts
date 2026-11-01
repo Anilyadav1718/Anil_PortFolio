@@ -60,3 +60,4 @@ export async function DELETE() {
   response.cookies.delete('admin_session');
   return response;
 }
+

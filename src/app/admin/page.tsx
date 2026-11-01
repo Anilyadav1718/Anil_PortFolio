@@ -46,6 +46,8 @@ import {
   Globe,
   Smartphone,
   Laptop,
+  Menu,
+  X,
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -54,6 +56,9 @@ export default function AdminPage() {
   const [passcode, setPasscode] = useState('');
   const [authError, setAuthError] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
+
+  // Mobile Drawer State
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
   // Active navigation tab
   const [activeTab, setActiveTab] = useState<
@@ -89,6 +94,28 @@ export default function AdminPage() {
 
   // Status message for saves
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const contentNavItems = [
+    { id: 'experience' as const, label: 'Experience', icon: Briefcase },
+    { id: 'projects' as const, label: 'Projects', icon: FolderGit2 },
+    { id: 'skills' as const, label: 'Skills', icon: Cpu },
+    { id: 'education' as const, label: 'Education', icon: GraduationCap },
+    { id: 'research' as const, label: 'Research', icon: BookOpen },
+    { id: 'certifications' as const, label: 'Certifications', icon: Award },
+    { id: 'achievements' as const, label: 'Achievements', icon: Trophy },
+  ];
+
+  const engagementNavItems = [
+    { id: 'overview' as const, label: 'Overview', icon: BarChart3 },
+    { id: 'analytics' as const, label: 'Visitors & Traffic', icon: Users },
+    { id: 'messages' as const, label: `Contact Messages (${messages.length})`, icon: Mail },
+  ];
+
+  const managementNavItems = [
+    { id: 'resume' as const, label: 'Resume', icon: FileText },
+    { id: 'socials' as const, label: 'Social Links', icon: Share2 },
+    { id: 'settings' as const, label: 'Site Settings', icon: Settings },
+  ];
+
 
   // New Experience form state
   const [showNewExpForm, setShowNewExpForm] = useState(false);
@@ -392,9 +419,47 @@ export default function AdminPage() {
   // AUTHENTICATED WORKSTATION VIEW
   // --------------------------------------------------------------------------
   return (
-    <div className="min-h-screen bg-[#0C0C0F] text-[#E4E4E7] flex flex-col font-sans">
-      {/* Top Bar */}
-      <header className="h-14 bg-[#141419] border-b border-[#23232C] px-6 flex items-center justify-between shrink-0 font-mono">
+    <div className="min-h-screen w-full max-w-full overflow-x-hidden bg-[#0C0C0F] text-[#E4E4E7] flex flex-col font-sans">
+      {/* Mobile Top Bar (< 1024px) */}
+      <header className="flex lg:hidden h-14 bg-[#141419] border-b border-[#23232C] px-3 sm:px-4 items-center justify-between shrink-0 font-mono sticky top-0 z-30">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <button
+            type="button"
+            onClick={() => setIsMobileDrawerOpen(true)}
+            className="w-11 h-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-300 hover:text-white hover:bg-[#1E1E26] border border-[#2E2E38] shrink-0"
+            aria-label="Open Navigation Menu"
+          >
+            <Menu size={20} />
+          </button>
+          <div className="flex items-center gap-1.5 truncate">
+            <span className="w-2 h-2 bg-[#E9470B] shrink-0" />
+            <span className="font-bold text-white text-xs tracking-wider truncate">
+              ADMIN WORKSTATION
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0">
+          {saveStatus && (
+            <span className="text-emerald-400 text-[10px] hidden sm:flex items-center gap-1 font-semibold animate-pulse">
+              <Check size={12} /> Saved
+            </span>
+          )}
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="h-9 px-2.5 bg-[#1E1E26] hover:bg-[#282834] text-zinc-300 hover:text-white border border-[#2E2E38] flex items-center gap-1 text-xs font-mono transition-colors"
+            title="Open Public Site"
+          >
+            <span>Site</span>
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      </header>
+
+      {/* Desktop Top Bar (>= 1024px) */}
+      <header className="hidden lg:flex h-14 bg-[#141419] border-b border-[#23232C] px-6 items-center justify-between shrink-0 font-mono sticky top-0 z-30">
         <div className="flex items-center gap-3">
           <span className="w-2.5 h-2.5 bg-[#E9470B]" />
           <span className="font-bold text-white text-sm tracking-wider">
@@ -413,7 +478,7 @@ export default function AdminPage() {
           )}
           <button
             onClick={loadAllData}
-            className="p-1.5 text-[#9CA3AF] hover:text-white border border-[#2A2A35]"
+            className="p-2 text-[#9CA3AF] hover:text-white border border-[#2A2A35] min-h-[36px]"
             title="Reload Data"
           >
             <RefreshCw size={14} />
@@ -422,14 +487,14 @@ export default function AdminPage() {
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3 py-1 bg-[#1E1E26] hover:bg-[#282834] text-white border border-[#2E2E38] flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 bg-[#1E1E26] hover:bg-[#282834] text-white border border-[#2E2E38] flex items-center gap-1.5 transition-colors min-h-[36px]"
           >
             <span>Open Public Portfolio</span>
             <ExternalLink size={12} />
           </a>
           <button
             onClick={handleLogout}
-            className="px-3 py-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 flex items-center gap-1.5 transition-colors min-h-[36px]"
           >
             <LogOut size={12} />
             <span>Logout</span>
@@ -437,10 +502,150 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {/* Mobile Navigation Drawer Overlay (< 1024px) */}
+      {isMobileDrawerOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden font-mono">
+          <div
+            className="fixed inset-0 bg-black/65 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileDrawerOpen(false)}
+          />
+          <div className="fixed inset-y-0 left-0 w-[min(84vw,320px)] h-[100dvh] bg-[#111116] border-r border-[#23232C] shadow-2xl flex flex-col justify-between overflow-y-auto z-50 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] animate-in slide-in-from-left duration-200">
+            <div className="p-4 space-y-6">
+              <div className="flex items-center justify-between border-b border-[#23232C] pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 bg-[#E9470B]" />
+                  <span className="font-bold text-white text-xs tracking-wider">
+                    NAVIGATION
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsMobileDrawerOpen(false)}
+                  className="w-11 h-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-zinc-400 hover:text-white hover:bg-[#1E1E26] rounded"
+                  aria-label="Close menu"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div>
+                <div className="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 px-2">
+                  CONTENT
+                </div>
+                <div className="space-y-1">
+                  {contentNavItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setIsMobileDrawerOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors min-h-[44px] ${
+                          activeTab === item.id
+                            ? 'bg-[#E9470B] text-white font-semibold'
+                            : 'text-[#A1A1AA] hover:bg-[#1A1A22] hover:text-white'
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span className="text-xs">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 px-2">
+                  ENGAGEMENT
+                </div>
+                <div className="space-y-1">
+                  {engagementNavItems.map((item) => {
+                    const Icon = item.icon;
+                    const label = item.id === 'messages' ? `Contact Messages (${messages.length})` : item.label;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setIsMobileDrawerOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors min-h-[44px] ${
+                          activeTab === item.id
+                            ? 'bg-[#E9470B] text-white font-semibold'
+                            : 'text-[#A1A1AA] hover:bg-[#1A1A22] hover:text-white'
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span className="text-xs">{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] text-[#6B7280] font-bold uppercase tracking-wider mb-2 px-2">
+                  MANAGEMENT
+                </div>
+                <div className="space-y-1">
+                  {managementNavItems.map((item) => {
+                    const Icon = item.icon;
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setIsMobileDrawerOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-3 py-3 text-left transition-colors min-h-[44px] ${
+                          activeTab === item.id
+                            ? 'bg-[#E9470B] text-white font-semibold'
+                            : 'text-[#A1A1AA] hover:bg-[#1A1A22] hover:text-white'
+                        }`}
+                      >
+                        <Icon size={16} />
+                        <span className="text-xs">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-[#23232C] space-y-2 shrink-0">
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full flex items-center justify-between px-3 py-3 bg-[#1E1E26] hover:bg-[#282834] text-white border border-[#2E2E38] text-xs min-h-[44px] transition-colors"
+              >
+                <span>Open Public Portfolio</span>
+                <ExternalLink size={14} />
+              </a>
+              <button
+                onClick={() => {
+                  setIsMobileDrawerOpen(false);
+                  handleLogout();
+                }}
+                className="w-full flex items-center justify-between px-3 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs min-h-[44px] transition-colors"
+              >
+                <span>Logout</span>
+                <LogOut size={14} />
+              </button>
+              <div className="pt-2 text-[10px] text-zinc-500">
+                <div>Single Source: Supabase / Local</div>
+                <div>Status: Operational</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Workspace */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Navigation Sidebar */}
-        <aside className="w-64 bg-[#111116] border-r border-[#23232C] flex flex-col justify-between overflow-y-auto shrink-0 font-mono text-xs">
+        <aside className="hidden lg:flex w-64 bg-[#111116] border-r border-[#23232C] flex-col justify-between overflow-y-auto shrink-0 font-mono text-xs">
           <div className="p-4 space-y-6">
             {/* CONTENT SECTION */}
             <div>
@@ -544,8 +749,8 @@ export default function AdminPage() {
         </aside>
 
         {/* Right Main Content Area (Unclipped, Full-Width, Independent Scroll) */}
-        <main className="flex-1 bg-[#0A0A0D] overflow-y-auto p-8">
-          <div className="max-w-6xl mx-auto space-y-8">
+        <main className="flex-1 bg-[#0A0A0D] overflow-y-auto p-4 sm:p-6 lg:p-8 min-w-0 w-full max-w-full">
+          <div className="max-w-6xl mx-auto space-y-6 sm:space-y-8 min-w-0 w-full">
             {/* TAB 1: OVERVIEW */}
             {activeTab === 'overview' && analyticsData && (
               <div className="space-y-8">
@@ -557,7 +762,7 @@ export default function AdminPage() {
                 </div>
 
                 {/* Metric Cards Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 font-mono">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 font-mono">
                   <div className="p-5 bg-[#121217] border border-[#23232C]">
                     <div className="text-xs text-[#9CA3AF] uppercase">TOTAL VISITORS</div>
                     <div className="text-3xl font-black text-white mt-2">
@@ -639,19 +844,158 @@ export default function AdminPage() {
               </div>
             )}
 
+            
+            {/* TAB: VISITORS & TRAFFIC */}
+            {activeTab === 'analytics' && analyticsData && (
+              <div className="space-y-6 font-mono text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-white font-sans break-words">Visitors & Traffic</h2>
+                    <p className="text-xs text-[#9CA3AF] mt-1 break-words">
+                      Live visitor sessions, devices, geographic distribution, and access logs.
+                    </p>
+                  </div>
+                  <button
+                    onClick={loadAllData}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-[#1E1E26] hover:bg-[#282834] text-white border border-[#2E2E38] flex items-center justify-center gap-2 min-h-[44px]"
+                  >
+                    <RefreshCw size={14} /> Refresh Sessions
+                  </button>
+                </div>
+
+                {/* KPI Metrics */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                  <div className="p-4 bg-[#121217] border border-[#23232C]">
+                    <div className="text-[11px] text-[#9CA3AF] uppercase">TOTAL SESSIONS</div>
+                    <div className="text-2xl font-black text-white mt-1">
+                      {analyticsData.overview?.totalVisitors || 0}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-[#121217] border border-[#23232C]">
+                    <div className="text-[11px] text-[#9CA3AF] uppercase">PAGE VIEWS</div>
+                    <div className="text-2xl font-black text-[#E9470B] mt-1">
+                      {analyticsData.overview?.totalPageViews || 0}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-[#121217] border border-[#23232C]">
+                    <div className="text-[11px] text-[#9CA3AF] uppercase">RESUME VIEWS</div>
+                    <div className="text-2xl font-black text-[#25BFD0] mt-1">
+                      {analyticsData.overview?.totalResumeViews || 0}
+                    </div>
+                  </div>
+                  <div className="p-4 bg-[#121217] border border-[#23232C]">
+                    <div className="text-[11px] text-[#9CA3AF] uppercase">RETURNING</div>
+                    <div className="text-2xl font-black text-white mt-1">
+                      {analyticsData.overview?.returningVisitors || 0}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Breakdown Chips */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 bg-[#121217] border border-[#23232C] space-y-2">
+                    <h3 className="font-bold text-white text-xs uppercase border-b border-[#23232C] pb-2">Devices</h3>
+                    <div className="space-y-1.5">
+                      {(analyticsData.devices || []).map((d: any) => (
+                        <div key={d.name} className="flex justify-between items-center text-xs">
+                          <span className="text-zinc-400">{d.name}</span>
+                          <span className="font-bold text-white px-2 py-0.5 bg-[#1C1C24]">{d.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-[#121217] border border-[#23232C] space-y-2">
+                    <h3 className="font-bold text-white text-xs uppercase border-b border-[#23232C] pb-2">Browsers</h3>
+                    <div className="space-y-1.5">
+                      {(analyticsData.browsers || []).map((b: any) => (
+                        <div key={b.name} className="flex justify-between items-center text-xs">
+                          <span className="text-zinc-400">{b.name}</span>
+                          <span className="font-bold text-white px-2 py-0.5 bg-[#1C1C24]">{b.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="p-4 bg-[#121217] border border-[#23232C] space-y-2">
+                    <h3 className="font-bold text-white text-xs uppercase border-b border-[#23232C] pb-2">Traffic Sources</h3>
+                    <div className="space-y-1.5">
+                      {(analyticsData.sources || []).map((s: any) => (
+                        <div key={s.name} className="flex justify-between items-center text-xs">
+                          <span className="text-zinc-400 truncate max-w-[150px]">{s.name}</span>
+                          <span className="font-bold text-white px-2 py-0.5 bg-[#1C1C24]">{s.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Visitor Session Cards List */}
+                <div className="space-y-3">
+                  <h3 className="font-bold text-white text-sm uppercase">Active & Recent Visitor Sessions</h3>
+                  {(analyticsData.recentSessions || []).length > 0 ? (
+                    (analyticsData.recentSessions || []).map((s: any, idx: number) => (
+                      <div
+                        key={s.id || idx}
+                        className="p-4 bg-[#121217] border border-[#23232C] space-y-2.5 max-w-full min-w-0"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 border-b border-[#1E1E26] pb-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-2 h-2 bg-emerald-400 rounded-full animate-ping" />
+                            <span className="font-bold text-white text-xs sm:text-sm">Anonymous Visitor</span>
+                            <span className="text-[#E9470B] text-xs">[{s.country || 'Global'}]</span>
+                          </div>
+                          <span className="text-[11px] text-zinc-500">
+                            {new Date(s.last_visit).toLocaleString()}
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                          <div>
+                            <span className="text-zinc-600 block text-[10px] uppercase">Device</span>
+                            <span className="text-white font-medium">{s.device_type || 'Desktop'}</span>
+                          </div>
+                          <div>
+                            <span className="text-zinc-600 block text-[10px] uppercase">Browser</span>
+                            <span className="text-white font-medium">{s.browser || 'Unknown'}</span>
+                          </div>
+                          <div>
+                            <span className="text-zinc-600 block text-[10px] uppercase">OS</span>
+                            <span className="text-white font-medium">{s.os || 'Unknown'}</span>
+                          </div>
+                          <div>
+                            <span className="text-zinc-600 block text-[10px] uppercase">Visits</span>
+                            <span className="text-[#25BFD0] font-bold">{s.visit_count || 1}</span>
+                          </div>
+                        </div>
+
+                        <div className="text-[11px] text-zinc-500 pt-1 border-t border-[#1E1E26] truncate">
+                          Referrer Source: {s.referrer || 'Direct Entry'}
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center text-zinc-500 bg-[#121217] border border-[#23232C]">
+                      No recorded visitor sessions yet. Telemetry listener running.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* TAB 2: EXPERIENCE CRUD */}
             {activeTab === 'experience' && (
               <div className="space-y-6 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-white font-sans">Experience Management</h2>
-                    <p className="text-xs text-[#9CA3AF] font-mono mt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white font-sans break-words">Experience Management</h2>
+                    <p className="text-xs text-[#9CA3AF] font-mono mt-1 break-words">
                       Manage career records. Added or edited experiences immediately reflect on the live portfolio.
                     </p>
                   </div>
                   <button
                     onClick={() => setShowNewExpForm(!showNewExpForm)}
-                    className="px-3.5 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white text-xs font-mono font-bold flex items-center gap-1.5 shadow-md transition-colors"
+                    className="w-full sm:w-auto px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white text-xs font-mono font-bold flex items-center justify-center gap-1.5 shadow-md transition-colors min-h-[44px] shrink-0"
                   >
                     <Plus size={15} /> {showNewExpForm ? 'Close Form' : 'Add Experience'}
                   </button>
@@ -659,7 +1003,7 @@ export default function AdminPage() {
 
                 {/* NEW EXPERIENCE FORM MODAL/DRAWER */}
                 {showNewExpForm && (
-                  <div className="p-6 bg-[#16161E] border-2 border-[#E9470B] space-y-5 shadow-2xl">
+                  <div className="p-4 sm:p-6 bg-[#16161E] border-2 border-[#E9470B] space-y-4 sm:space-y-5 shadow-2xl">
                     <div className="flex items-center justify-between border-b border-[#2E2E38] pb-3">
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 bg-[#E9470B] animate-pulse" />
@@ -675,7 +1019,7 @@ export default function AdminPage() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                       <div>
                         <label className="text-[11px] text-[#E9470B] uppercase font-bold block mb-1">
                           Company *
@@ -769,9 +1113,9 @@ export default function AdminPage() {
                         Technical Contribution Bullets
                       </label>
                       {newExpForm.bullets.map((b, bIdx) => (
-                        <div key={bIdx} className="flex gap-2">
-                          <input
-                            type="text"
+                        <div key={bIdx} className="flex gap-2 items-start">
+                          <textarea
+                            rows={2}
                             placeholder="e.g. Architected GenAI pipelines with FastAPI, RAG, and ChromaDB."
                             value={b}
                             onChange={(e) => {
@@ -779,7 +1123,7 @@ export default function AdminPage() {
                               nextBullets[bIdx] = e.target.value;
                               setNewExpForm({ ...newExpForm, bullets: nextBullets });
                             }}
-                            className="flex-1 p-2 bg-[#0A0A0D] border border-[#3B3B48] text-white focus:border-[#E9470B] focus:outline-none"
+                            className="flex-1 p-2.5 bg-[#0A0A0D] border border-[#3B3B48] text-white focus:border-[#E9470B] focus:outline-none text-xs min-h-[72px] resize-y"
                           />
                           <button
                             type="button"
@@ -787,10 +1131,10 @@ export default function AdminPage() {
                               const nextBullets = newExpForm.bullets.filter((_, i) => i !== bIdx);
                               setNewExpForm({ ...newExpForm, bullets: nextBullets });
                             }}
-                            className="p-2 text-red-400 hover:text-red-300"
+                            className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
                             title="Remove bullet"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       ))}
@@ -802,7 +1146,7 @@ export default function AdminPage() {
                             bullets: [...newExpForm.bullets, ''],
                           })
                         }
-                        className="text-[11px] text-[#E9470B] hover:underline flex items-center gap-1 font-bold pt-1"
+                        className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#E9470B] hover:bg-[#E9470B]/10 border border-[#E9470B]/30 min-h-[38px]"
                       >
                         + Add another contribution bullet
                       </button>
@@ -829,15 +1173,15 @@ export default function AdminPage() {
                     </div>
 
                     {/* Save Button */}
-                    <div className="pt-3 border-t border-[#2E2E38] flex items-center justify-between">
+                    <div className="pt-3 border-t border-[#2E2E38] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                       <p className="text-[11px] text-zinc-400">
                         * Required fields. Clicking publish will instantly save and display on your portfolio.
                       </p>
-                      <div className="flex items-center gap-3">
+                      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
                         <button
                           type="button"
                           onClick={() => setShowNewExpForm(false)}
-                          className="px-3 py-2 border border-[#3B3B48] text-zinc-300 hover:text-white"
+                          className="px-4 py-2.5 border border-[#3B3B48] text-zinc-300 hover:text-white min-h-[44px] text-xs flex items-center justify-center"
                         >
                           Cancel
                         </button>
@@ -875,7 +1219,7 @@ export default function AdminPage() {
                               bullets: ['Built enterprise GenAI and automation workflows using Python.'],
                             });
                           }}
-                          className="px-5 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-2 shadow-lg"
+                          className="px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-2 shadow-lg min-h-[44px] text-xs w-full sm:w-auto"
                         >
                           <Save size={15} /> [ PUBLISH EXPERIENCE TO PORTFOLIO ]
                         </button>
@@ -895,30 +1239,30 @@ export default function AdminPage() {
                   {experiences.map((exp) => (
                     <div
                       key={exp.id}
-                      className="p-6 bg-[#121217] border border-[#23232C] space-y-4 font-mono text-xs"
+                      className="p-4 sm:p-6 bg-[#121217] border border-[#23232C] space-y-4 font-mono text-xs max-w-full min-w-0"
                     >
-                      <div className="flex items-center justify-between border-b border-[#23232C] pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 bg-[#E9470B]" />
-                          <span className="text-sm font-bold text-white">{exp.company}</span>
-                          <span className="text-[#6B7280]">/</span>
-                          <span className="text-[#E9470B] font-semibold">{exp.role}</span>
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#23232C] pb-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-2.5 h-2.5 bg-[#E9470B] shrink-0" />
+                          <span className="font-bold text-white text-xs sm:text-sm truncate">{exp.company}</span>
+                          <span className="text-zinc-600">/</span>
+                          <span className="text-[#E9470B] text-xs truncate">{exp.role}</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
                           <button
                             type="button"
                             onClick={() => saveEntity('experience', exp)}
-                            className="px-2.5 py-1 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold text-[11px] flex items-center gap-1 shadow-sm"
+                            className="px-3 py-1.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold text-xs flex items-center gap-1 shadow-sm min-h-[36px]"
                             title="Save this experience"
                           >
-                            <Save size={12} /> Save Record
+                            <Save size={13} /> Save
                           </button>
                           <button
                             type="button"
                             onClick={() =>
                               saveEntity('experience', { ...exp, is_published: !exp.is_published })
                             }
-                            className={`px-2 py-0.5 text-[11px] font-bold border ${
+                            className={`px-3 py-1.5 text-xs font-bold border min-h-[36px] ${
                               exp.is_published
                                 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                                 : 'bg-zinc-700/20 text-zinc-400 border-zinc-700'
@@ -929,15 +1273,15 @@ export default function AdminPage() {
                           <button
                             type="button"
                             onClick={() => deleteEntity('experience', exp.id)}
-                            className="p-1 text-red-400 hover:text-red-300"
+                            className="p-2 text-red-400 hover:text-red-300 min-h-[36px] min-w-[36px] flex items-center justify-center border border-transparent hover:border-red-500/30"
                             title="Delete Experience"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                         <div>
                           <label className="text-[11px] text-[#6B7280] uppercase block mb-1">Company</label>
                           <input
@@ -1005,9 +1349,9 @@ export default function AdminPage() {
                           Technical Contribution Bullets
                         </label>
                         {(exp.bullets || []).map((b, bIdx) => (
-                          <div key={bIdx} className="flex gap-2">
-                            <input
-                              type="text"
+                          <div key={bIdx} className="flex gap-2 items-start">
+                            <textarea
+                              rows={2}
                               value={b}
                               onChange={(e) => {
                                 const nextBullets = [...(exp.bullets || [])];
@@ -1015,7 +1359,7 @@ export default function AdminPage() {
                                 const updated = { ...exp, bullets: nextBullets };
                                 setExperiences(experiences.map((x) => (x.id === exp.id ? updated : x)));
                               }}
-                              className="flex-1 p-2 bg-[#0A0A0D] border border-[#23232C] text-white focus:border-[#E9470B] focus:outline-none"
+                              className="flex-1 p-2.5 bg-[#0A0A0D] border border-[#23232C] text-white focus:border-[#E9470B] focus:outline-none min-h-[72px] resize-y text-xs"
                             />
                             <button
                               type="button"
@@ -1024,10 +1368,10 @@ export default function AdminPage() {
                                 const updated = { ...exp, bullets: nextBullets };
                                 setExperiences(experiences.map((x) => (x.id === exp.id ? updated : x)));
                               }}
-                              className="p-2 text-red-400 hover:text-red-300"
+                              className="p-3 min-h-[44px] min-w-[44px] flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/20"
                               title="Delete bullet"
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={16} />
                             </button>
                           </div>
                         ))}
@@ -1040,7 +1384,7 @@ export default function AdminPage() {
                             };
                             setExperiences(experiences.map((x) => (x.id === exp.id ? updated : x)));
                           }}
-                          className="text-[11px] text-[#E9470B] hover:underline font-bold"
+                          className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-[#E9470B] hover:bg-[#E9470B]/10 border border-[#E9470B]/30 min-h-[38px]"
                         >
                           + Add bullet
                         </button>
@@ -1063,11 +1407,18 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      <div className="pt-2 flex justify-end">
+                      <div className="pt-3 border-t border-[#1C1C24] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <button
+                          type="button"
+                          onClick={() => deleteEntity('experience', exp.id)}
+                          className="w-full sm:w-auto px-4 py-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/30 flex items-center justify-center gap-1.5 min-h-[44px]"
+                        >
+                          <Trash2 size={14} /> Delete Record
+                        </button>
                         <button
                           type="button"
                           onClick={() => saveEntity('experience', exp)}
-                          className="px-4 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5 shadow-md"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 shadow-md min-h-[44px]"
                         >
                           <Save size={14} /> Save Experience Record
                         </button>
@@ -1081,10 +1432,10 @@ export default function AdminPage() {
             {/* TAB 3: PROJECTS CRUD */}
             {activeTab === 'projects' && (
               <div className="space-y-6 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-white font-sans">Projects Management</h2>
-                    <p className="text-xs text-[#9CA3AF] mt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white font-sans break-words">Projects Management</h2>
+                    <p className="text-xs text-[#9CA3AF] mt-1 break-words">
                       Manage portfolio deployments (FarmerVerify AI, CMS AI Assistant, etc.).
                     </p>
                   </div>
@@ -1112,9 +1463,9 @@ export default function AdminPage() {
                       };
                       saveEntity('project', newProj);
                     }}
-                    className="px-3 py-1.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5"
+                    className="w-full sm:w-auto px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px] shrink-0"
                   >
-                    <Plus size={14} /> Add Project
+                    <Plus size={15} /> Add Project
                   </button>
                 </div>
 
@@ -1122,19 +1473,20 @@ export default function AdminPage() {
                   {projects.map((proj) => (
                     <div
                       key={proj.id}
-                      className="p-6 bg-[#121217] border border-[#23232C] space-y-4"
+                      className="p-4 sm:p-6 bg-[#121217] border border-[#23232C] space-y-4 max-w-full min-w-0"
                     >
-                      <div className="flex items-center justify-between border-b border-[#23232C] pb-3">
-                        <div className="flex items-center gap-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#23232C] pb-3">
+                        <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                          <span className="w-2.5 h-2.5 bg-[#E9470B] shrink-0" />
                           <span className="font-bold text-sm text-white">{proj.title}</span>
                           <span className="text-[#E9470B] text-xs">[{proj.system_code}]</span>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap shrink-0">
                           <button
                             onClick={() =>
                               saveEntity('project', { ...proj, featured: !proj.featured })
                             }
-                            className={`px-2 py-0.5 text-[10px] font-bold border ${
+                            className={`px-3 py-1.5 text-xs font-bold border min-h-[36px] ${
                               proj.featured
                                 ? 'bg-[#E9470B]/20 text-[#E9470B] border-[#E9470B]'
                                 : 'bg-[#1E1E26] text-[#6B7280] border-[#2A2A35]'
@@ -1146,7 +1498,7 @@ export default function AdminPage() {
                             onClick={() =>
                               saveEntity('project', { ...proj, is_published: !proj.is_published })
                             }
-                            className={`px-2 py-0.5 text-[10px] font-bold border ${
+                            className={`px-3 py-1.5 text-xs font-bold border min-h-[36px] ${
                               proj.is_published
                                 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                                 : 'bg-zinc-700/20 text-zinc-400 border-zinc-700'
@@ -1156,9 +1508,10 @@ export default function AdminPage() {
                           </button>
                           <button
                             onClick={() => deleteEntity('project', proj.id)}
-                            className="p-1 text-red-400 hover:text-red-300"
+                            className="p-2 text-red-400 hover:text-red-300 min-h-[36px] min-w-[36px] flex items-center justify-center border border-transparent hover:border-red-500/30"
+                            title="Delete Project"
                           >
-                            <Trash2 size={14} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </div>
@@ -1311,10 +1664,10 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      <div className="pt-2 flex justify-end">
+                      <div className="pt-3 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                         <button
                           onClick={() => saveEntity('project', proj)}
-                          className="px-4 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5"
+                          className="w-full sm:w-auto px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 shadow-md min-h-[44px]"
                         >
                           <Save size={14} /> Save Project
                         </button>
@@ -1328,10 +1681,10 @@ export default function AdminPage() {
             {/* TAB 4: SKILLS CRUD */}
             {activeTab === 'skills' && (
               <div className="space-y-6 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold text-white font-sans">Skills Console Management</h2>
-                    <p className="text-xs text-[#9CA3AF] mt-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <h2 className="text-xl sm:text-2xl font-bold text-white font-sans break-words">Skills Console Management</h2>
+                    <p className="text-xs text-[#9CA3AF] mt-1 break-words">
                       Manage skills, disciplines, practical applications, and engineering focus.
                     </p>
                   </div>
@@ -1352,9 +1705,9 @@ export default function AdminPage() {
                       };
                       saveEntity('skill', newSkill);
                     }}
-                    className="px-3 py-1.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5"
+                    className="w-full sm:w-auto px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px] shrink-0"
                   >
-                    <Plus size={14} /> Add Skill
+                    <Plus size={15} /> Add Skill
                   </button>
                 </div>
 
@@ -1476,12 +1829,12 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <div className="flex justify-end pt-1">
+                      <div className="pt-2 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                         <button
                           onClick={() => saveEntity('skill', sk)}
-                          className="px-3 py-1.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1"
+                          className="w-full sm:w-auto px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
                         >
-                          <Save size={12} /> Save Skill
+                          <Save size={14} /> Save Skill
                         </button>
                       </div>
                     </div>
@@ -1508,8 +1861,8 @@ export default function AdminPage() {
                   </p>
 
                   <div className="pt-2">
-                    <label className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold cursor-pointer">
-                      <Upload size={14} />
+                    <label className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold cursor-pointer w-full sm:w-auto min-h-[44px]">
+                      <Upload size={15} />
                       <span>SELECT PDF FROM DEVICE</span>
                       <input
                         type="file"
@@ -1529,11 +1882,11 @@ export default function AdminPage() {
                       key={res.id}
                       className={`p-4 bg-[#121217] border ${
                         res.is_active ? 'border-[#E9470B]' : 'border-[#23232C]'
-                      } flex items-center justify-between`}
+                      } flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-full min-w-0`}
                     >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-white">{res.file_name}</span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-bold text-white text-xs sm:text-sm break-all">{res.file_name}</span>
                           {res.is_active && (
                             <span className="px-2 py-0.5 bg-[#E9470B] text-white font-bold text-[10px]">
                               ACTIVE
@@ -1546,28 +1899,29 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-2 flex-wrap shrink-0">
                         <a
                           href={res.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-3 py-1 bg-[#1E1E26] hover:bg-[#282834] text-white border border-[#2A2A35]"
+                          className="px-3 py-2 bg-[#1E1E26] hover:bg-[#282834] text-white border border-[#2A2A35] min-h-[40px] flex items-center justify-center text-xs"
                         >
                           Preview
                         </a>
                         {!res.is_active && (
                           <button
                             onClick={() => handleSetActiveResume(res.id)}
-                            className="px-3 py-1 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold"
+                            className="px-3 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold min-h-[40px] flex items-center justify-center text-xs"
                           >
                             Set Active
                           </button>
                         )}
                         <button
                           onClick={() => handleDeleteResume(res.id)}
-                          className="p-1.5 text-red-400 hover:text-red-300"
+                          className="p-2 text-red-400 hover:text-red-300 min-h-[40px] min-w-[40px] flex items-center justify-center border border-red-500/20"
+                          title="Delete Resume"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     </div>
@@ -1591,12 +1945,12 @@ export default function AdminPage() {
                     messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className="p-6 bg-[#121217] border border-[#23232C] space-y-3"
+                        className="p-4 sm:p-6 bg-[#121217] border border-[#23232C] space-y-3 max-w-full min-w-0"
                       >
-                        <div className="flex items-center justify-between border-b border-[#23232C] pb-2">
-                          <div className="flex items-center gap-3">
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 border-b border-[#23232C] pb-2">
+                          <div className="flex items-center gap-2 flex-wrap min-w-0">
                             <span className="font-bold text-white text-sm">{msg.name}</span>
-                            <span className="text-[#E9470B]">&lt;{msg.email}&gt;</span>
+                            <span className="text-[#E9470B] text-xs">&lt;{msg.email}&gt;</span>
                           </div>
                           <span className="text-[11px] text-[#6B7280]">
                             {new Date(msg.created_at).toLocaleString()}
@@ -1774,10 +2128,10 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div className="pt-2 flex justify-end">
+                  <div className="pt-3 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                     <button
                       onClick={() => saveEntity('settings', settings)}
-                      className="px-4 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
                     >
                       <Save size={14} /> Save Site Settings
                     </button>
@@ -1888,10 +2242,10 @@ export default function AdminPage() {
                       </div>
                     </div>
 
-                    <div className="pt-2 flex justify-end">
+                    <div className="pt-3 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                       <button
                         onClick={() => saveEntity('education', edu)}
-                        className="px-4 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5"
+                        className="w-full sm:w-auto px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
                       >
                         <Save size={14} /> Save Education
                       </button>
@@ -1982,10 +2336,10 @@ export default function AdminPage() {
                       />
                     </div>
 
-                    <div className="pt-2 flex justify-end">
+                    <div className="pt-3 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                       <button
                         onClick={() => saveEntity('research', res)}
-                        className="px-4 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5"
+                        className="w-full sm:w-auto px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
                       >
                         <Save size={14} /> Save Research Record
                       </button>
@@ -2049,12 +2403,12 @@ export default function AdminPage() {
                         </div>
                       </div>
 
-                      <div className="flex justify-end">
+                      <div className="pt-2 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                         <button
                           onClick={() => saveEntity('certification', cert)}
-                          className="px-3 py-1.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1"
+                          className="w-full sm:w-auto px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
                         >
-                          <Save size={12} /> Save
+                          <Save size={14} /> Save
                         </button>
                       </div>
                     </div>
@@ -2128,12 +2482,12 @@ export default function AdminPage() {
                         />
                       </div>
 
-                      <div className="flex justify-end">
+                      <div className="pt-2 border-t border-[#1C1C24] flex flex-col sm:flex-row justify-end">
                         <button
                           onClick={() => saveEntity('achievement', ach)}
-                          className="px-3 py-1.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1"
+                          className="w-full sm:w-auto px-4 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 min-h-[44px]"
                         >
-                          <Save size={12} /> Save
+                          <Save size={14} /> Save
                         </button>
                       </div>
                     </div>
@@ -2156,9 +2510,9 @@ export default function AdminPage() {
                   {socials.map((soc) => (
                     <div
                       key={soc.id}
-                      className="p-5 bg-[#121217] border border-[#23232C] flex items-center justify-between gap-4"
+                      className="p-4 sm:p-5 bg-[#121217] border border-[#23232C] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 max-w-full min-w-0"
                     >
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="w-full sm:flex-1 grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
                           <label className="text-[10px] text-[#6B7280] uppercase block">Platform</label>
                           <input
@@ -2196,7 +2550,7 @@ export default function AdminPage() {
 
                       <button
                         onClick={() => saveEntity('social', soc)}
-                        className="px-4 py-2 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center gap-1.5 shrink-0 self-end"
+                        className="w-full sm:w-auto px-5 py-2.5 bg-[#E9470B] hover:bg-[#D43E08] text-white font-bold flex items-center justify-center gap-1.5 shrink-0 sm:self-end min-h-[44px]"
                       >
                         <Save size={14} /> Save
                       </button>

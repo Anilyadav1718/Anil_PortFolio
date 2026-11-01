@@ -45,12 +45,15 @@
 
 html {
   scroll-behavior: smooth;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  max-width: 100%;
   overflow-x: hidden;
   transition: background-color 0.2s ease, color 0.2s ease;
   min-height: 100vh;
