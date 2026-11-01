@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import AdminShell from './AdminShell';
 
 export const metadata: Metadata = {
   title: 'Admin Workstation // Anil Panchitha',
@@ -15,9 +16,8 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen max-w-full overflow-x-hidden bg-[#0D0D11] text-[#E4E4E7]">
+    <AdminShell>
       {children}
-    </div>
+    </AdminShell>
   );
 }
-

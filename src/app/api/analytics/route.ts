@@ -5,6 +5,8 @@ import {
   recordVisitorSession,
   recordAnalyticsEvent,
   getAnalyticsDashboardData,
+  getAnalyticsSummary,
+  getVisitorSessionsPaginated,
 } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
@@ -49,10 +51,24 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const isSummary = req.nextUrl.searchParams.get('summary') === 'true';
+    const isSessions = req.nextUrl.searchParams.get('sessions') === 'true';
+
+    if (isSummary) {
+      const summary = await getAnalyticsSummary();
+      return NextResponse.json(summary);
+    }
+
+    if (isSessions) {
+      const page = Math.max(1, parseInt(req.nextUrl.searchParams.get('page') || '1'));
+      const limit = Math.min(50, Math.max(5, parseInt(req.nextUrl.searchParams.get('limit') || '25')));
+      const data = await getVisitorSessionsPaginated(page, limit);
+      return NextResponse.json(data);
+    }
+
     const data = await getAnalyticsDashboardData();
     return NextResponse.json(data);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
-

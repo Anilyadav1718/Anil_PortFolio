@@ -2,6 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { revalidatePath } from 'next/cache';
 import {
   getPortfolioData,
+  getExperiencesOnly,
+  getProjectsOnly,
+  getSkillsOnly,
+  getEducationOnly,
+  getResearchOnly,
+  getCertificationsOnly,
+  getAchievementsOnly,
+  getSiteSettingsOnly,
+  getSocialLinksOnly,
+  getContactMessagesPaginated,
+  getResumeFilesMetadataOnly,
+  getAnalyticsSummary,
   updateSiteSettings,
   saveExperience,
   deleteExperience,
@@ -25,14 +37,14 @@ import {
 export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
-function isAuthorized(req: NextRequest) {
+function isAuthorized(req: NextRequest): boolean {
   const cookie = req.cookies.get('admin_session');
   const headerToken =
     req.headers.get('authorization')?.replace('Bearer ', '') ||
     req.headers.get('x-admin-token');
   const serverPasscode = process.env.ADMIN_PASSCODE || 'admin2026';
 
-  return (
+  return Boolean(
     (cookie && cookie.value.startsWith('authenticated_token_')) ||
     (headerToken && (headerToken.startsWith('authenticated_token_') || headerToken === serverPasscode))
   );
@@ -40,10 +52,83 @@ function isAuthorized(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const section = req.nextUrl.searchParams.get('section') || req.nextUrl.searchParams.get('type');
+    const admin = isAuthorized(req);
+
+    // Section-specific targeted queries (blazing fast, loads ONLY the requested dataset)
+    if (section) {
+      switch (section) {
+        case 'experience':
+        case 'experiences': {
+          const experiences = await getExperiencesOnly(admin);
+          return NextResponse.json({ experiences });
+        }
+        case 'project':
+        case 'projects': {
+          const projects = await getProjectsOnly(admin);
+          return NextResponse.json({ projects });
+        }
+        case 'skill':
+        case 'skills': {
+          const skills = await getSkillsOnly(admin);
+          return NextResponse.json({ skills });
+        }
+        case 'education': {
+          const education = await getEducationOnly();
+          return NextResponse.json({ education });
+        }
+        case 'research': {
+          const research = await getResearchOnly(admin);
+          return NextResponse.json({ research });
+        }
+        case 'certification':
+        case 'certifications': {
+          const certifications = await getCertificationsOnly(admin);
+          return NextResponse.json({ certifications });
+        }
+        case 'achievement':
+        case 'achievements': {
+          const achievements = await getAchievementsOnly(admin);
+          return NextResponse.json({ achievements });
+        }
+        case 'setting':
+        case 'settings': {
+          const settings = await getSiteSettingsOnly();
+          return NextResponse.json({ settings });
+        }
+        case 'social':
+        case 'socials':
+        case 'social-links': {
+          const socials = await getSocialLinksOnly(admin);
+          return NextResponse.json({ socials });
+        }
+        case 'message':
+        case 'messages': {
+          const page = Math.max(1, parseInt(req.nextUrl.searchParams.get('page') || '1'));
+          const limit = Math.min(50, Math.max(5, parseInt(req.nextUrl.searchParams.get('limit') || '25')));
+          const data = await getContactMessagesPaginated(page, limit);
+          return NextResponse.json(data);
+        }
+        case 'resume':
+        case 'resumes': {
+          const resumes = await getResumeFilesMetadataOnly();
+          return NextResponse.json({ resumes });
+        }
+        case 'summary':
+        case 'analytics-summary': {
+          const summary = await getAnalyticsSummary();
+          return NextResponse.json(summary);
+        }
+        default:
+          break;
+      }
+    }
+
+    // Default full portfolio data for public portfolio homepage or legacy callers
     const portfolio = await getPortfolioData();
-    if (isAuthorized(req)) {
+    if (admin) {
       const messages = await getContactMessages();
-      const resumes = await getResumeFiles();
+      const resumes = await getResumeFilesMetadataOnly();
       return NextResponse.json({
         portfolio,
         messages,
@@ -150,12 +235,19 @@ export async function POST(req: NextRequest) {
         break;
 
       default:
-        return NextResponse.json({ error: 'Unknown entity type' }, { status: 400 });
+        return NextResponse.json({ error: `Unknown entity type: ${type}` }, { status: 400 });
     }
 
-    revalidatePath('/');
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin');
+      if (type) revalidatePath(`/admin/${type}`);
+    } catch {
+      // Ignore in non-ISR runtime
+    }
+
     return NextResponse.json(responseJson);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    return NextResponse.json({ error: err.message || 'Mutation failed' }, { status: 500 });
   }
 }
